@@ -203,37 +203,31 @@ extern CHIPSET Chipset;
 	}
 #endif
 
-	if (!(Chipset.IORam[BITOFFSET]&DON))
-	{
-		ZeroMemory(lcd, 4 * LCD_ROW * SCREENHEIGHT);
-        if (grayscale)
-            ZeroMemory(graylcd, 4 * LCD_ROW * SCREENHEIGHT);
-	}
-	else
-	{
-		p = lcd+(4*Chipset.d0size*LCD_ROW);	// bitmap offset
-        dp = (RGBQUAD *)p;
-        gp = (DWORD *)graylcd;
-		d = Chipset.start1;					// pixel offset counter
-        for (y = 0; y < MAINSCREENHEIGHT; ++y)
+	if (!(Chipset.IORam[BITOFFSET]&DON)) return;
+
+    p = lcd+(4*Chipset.d0size*LCD_ROW);	// bitmap offset
+    dp = (RGBQUAD *)p;
+    gp = (DWORD *)graylcd;
+    d = Chipset.start1;					// pixel offset counter
+    for (y = 0; y < MAINSCREENHEIGHT; ++y)
+    {
+        // read line with actual start1 address!!
+        Npeek(Buf,d,36);
+        for (x = 0; x < 36; ++x)	// every 4 pixel
         {
-            // read line with actual start1 address!!
-            Npeek(Buf,d,36);
-            for (x = 0; x < 36; ++x)	// every 4 pixel
+            DWORD x0 = LcdPattern[Buf[x]];
+            if (grayscale)
             {
-                DWORD x0 = LcdPattern[Buf[x]];
-                if (grayscale)
-                {
-                    x0 = DIBWORD4(gp,x0); ++gp;
-                }
-                *dp++ = LcdColors[((BYTE*)&x0)[0]];
-                *dp++ = LcdColors[((BYTE*)&x0)[1]];
-                *dp++ = LcdColors[((BYTE*)&x0)[2]];
-                *dp++ = LcdColors[((BYTE*)&x0)[3]];
+                x0 = DIBWORD4(gp,x0); ++gp;
             }
-            d+=Chipset.width;
+            *dp++ = LcdColors[((BYTE*)&x0)[0]];
+            *dp++ = LcdColors[((BYTE*)&x0)[1]];
+            *dp++ = LcdColors[((BYTE*)&x0)[2]];
+            *dp++ = LcdColors[((BYTE*)&x0)[3]];
         }
-	}
+        d+=Chipset.width;
+    }
+
     // BitBlt: destbuf, xdest, ydest, wdest, hdest,
     // srcbuf, xsrc, ysrc, op (copy)
     [self setNeedsDisplayInRect: NSMakeRect(0., (SCREENHEIGHT-Chipset.d0size-MAINSCREENHEIGHT)*lcdScale, 131.*lcdScale, MAINSCREENHEIGHT*lcdScale)];

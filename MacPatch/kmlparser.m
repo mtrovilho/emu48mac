@@ -534,6 +534,10 @@ quit:
 
 - (TokenId)Lex:(UINT)nMode
 {
+    if ((nMode != LEX_PARAM) && [scanner scanCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\r\n"] intoString:nil])
+    {
+        ++nLexLine;
+    }
     if ([scanner scanString:@"#" intoString:nil])
     {
         [scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\r\n"] intoString:nil];
