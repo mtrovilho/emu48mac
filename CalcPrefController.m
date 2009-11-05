@@ -327,7 +327,13 @@ USERDEFAULTS_ACCESSOR_INT(WaveBeep)
     if (standardCalcs)
         [allCalcs addObjectsFromArray: standardCalcs];
     // First search user's home directory (create calc folder on first run)
-    NSArray *systemPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSArray *systemPaths = NSSearchPathForDirectoriesInDomains(
+#if TARGET_OS_IPHONE
+        NSDocumentDirectory,
+#else
+        NSApplicationSupportDirectory,
+#endif
+        NSUserDomainMask, YES);
     NSString *calcPath;
     NSFileManager *fm = [NSFileManager defaultManager];
     BOOL isFolder = NO;
@@ -335,7 +341,18 @@ USERDEFAULTS_ACCESSOR_INT(WaveBeep)
     {
         calcPath = [[[systemPaths objectAtIndex: 0] stringByAppendingPathComponent: CALC_USER_PATH] stringByAppendingPathComponent: CALC_RES_PATH];
         if (![fm fileExistsAtPath:calcPath isDirectory:&isFolder])
-            [fm createDirectoryAtPath:calcPath attributes:nil];
+        {
+            NSArray *pathComponents = [calcPath pathComponents];
+            NSString *parentPath = @"";
+            NSString *pathComp;
+            NSEnumerator *pathEnum = [pathComponents objectEnumerator];
+            while ((pathComp = [pathEnum nextObject]))
+            {
+                parentPath = [parentPath stringByAppendingPathComponent: pathComp];
+                if (![fm fileExistsAtPath:parentPath isDirectory:&isFolder])
+                    [fm createDirectoryAtPath:parentPath attributes:nil];
+            }
+        }
         else if (!isFolder)
             return;
         NSArray *userCalcs = [[self class] calculatorsAtPath:calcPath relativeToPath:nil];
@@ -344,6 +361,7 @@ USERDEFAULTS_ACCESSOR_INT(WaveBeep)
             [allCalcs addObjectsFromArray: userCalcs];
         }
     }
+#if !TARGET_OS_IPHONE
     // Add all calcs found in system directories too
     systemPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSLocalDomainMask | NSNetworkDomainMask, YES);
     NSEnumerator *dirEnum = [systemPaths objectEnumerator];
@@ -355,10 +373,9 @@ USERDEFAULTS_ACCESSOR_INT(WaveBeep)
             [allCalcs addObjectsFromArray: userCalcs];
         }
     }
-    if ([allCalcs count] != [standardCalcs count])
-    {
-        [self setCalculators: allCalcs];
-    }
+#endif
+
+    [self setCalculators: allCalcs];
 
     int result = 0;
     id path = [[NSUserDefaults standardUserDefaults] objectForKey: @"DefaultCalculator"];

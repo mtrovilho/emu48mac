@@ -163,8 +163,16 @@
         BOOL isFolder = NO;
         if (![fm fileExistsAtPath:statePath isDirectory:&isFolder])
         {
-            if (![fm createDirectoryAtPath:statePath attributes:nil])
-                return nil;
+            NSArray *pathComponents = [statePath pathComponents];
+            NSString *parentPath = @"";
+            NSString *pathComp;
+            NSEnumerator *pathEnum = [pathComponents objectEnumerator];
+            while ((pathComp = [pathEnum nextObject]))
+            {
+                parentPath = [parentPath stringByAppendingPathComponent: pathComp];
+                if (![fm fileExistsAtPath:parentPath isDirectory:&isFolder])
+                    [fm createDirectoryAtPath:parentPath attributes:nil];
+            }
         }
         else if (!isFolder)
         {
