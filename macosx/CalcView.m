@@ -42,6 +42,7 @@ VOID StopDisplayBW(VOID);
 @interface CalcView(Private)
 - (void)UpdateContrast:(BYTE)byContrast;
 - (void)GetLineCounter:(NSMutableData *)aOutData;
+- (void)scheduleBWUpdate;
 - (BOOL)keyEvent:(NSEvent *)theEvent pressed:(BOOL)aPressed;
 @end
 
@@ -319,6 +320,11 @@ VOID StopDisplayBW(VOID);
     bwLcdTimer = nil;
 }
 
+- (void)scheduleBWUpdate
+{
+    bwLcdTimer = [[NSTimer scheduledTimerWithTimeInterval:DISPLAY_FREQ target:self selector:@selector(updateBW:) userInfo:nil repeats:NO] retain];  // one-shot update
+}
+
 - (void)StartDisplay:(NSNumber *)aInitial
 {
     BYTE byInitial = [aInitial unsignedCharValue];
@@ -411,14 +417,14 @@ VOID StopDisplayBW(VOID);
     // Do our own display coalescing as incremental updates using
     // setNeedsDisplayInRect is proving to be too inefficient
     if (nil == bwLcdTimer)
-        bwLcdTimer = [[NSTimer scheduledTimerWithTimeInterval:DISPLAY_FREQ target:self selector:@selector(updateBW:) userInfo:nil repeats:NO] retain];  // one-shot update
+        [self performSelectorOnMainThread:@selector(scheduleBWUpdate) withObject:nil waitUntilDone:YES];
 }
 
 - (void)WriteToMenu:(CalcLCDWriteArgument *)args
 {
     [lcd WriteToMenu: args];
     if (nil == bwLcdTimer)
-        bwLcdTimer = [[NSTimer scheduledTimerWithTimeInterval:DISPLAY_FREQ target:self selector:@selector(updateBW:) userInfo:nil repeats:NO] retain];  // one-shot update
+        [self performSelectorOnMainThread:@selector(scheduleBWUpdate) withObject:nil waitUntilDone:YES];
 }
 
 - (void)UpdateAnnunciators
@@ -643,14 +649,14 @@ VOID RefreshDisp0()
 VOID WriteToMainDisplay(LPBYTE a, DWORD d, UINT s)
 {
     CalcLCDWriteArgument *args = [[CalcLCDWriteArgument alloc] initWithPointer:a offset:d count:s];
-    [SharedView performSelectorOnMainThread:@selector(WriteToMain:) withObject:args waitUntilDone:YES];
+    [SharedView WriteToMain: args];
     [args release];
 }
 
 VOID WriteToMenuDisplay(LPBYTE a, DWORD d, UINT s)
 {
     CalcLCDWriteArgument *args = [[CalcLCDWriteArgument alloc] initWithPointer:a offset:d count:s];
-    [SharedView performSelectorOnMainThread:@selector(WriteToMenu:) withObject:args waitUntilDone:YES];
+    [SharedView WriteToMenu: args];
     [args release];
 }
 
