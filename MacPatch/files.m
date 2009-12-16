@@ -1187,8 +1187,13 @@ restore:
 	CrcRom(&Chipset.wRomCrc);               // save fingerprint of ROM
 	CrcPort2(&Chipset.wPort2Crc);           // save fingerprint of port2
 
-    //    NSString *kmlPath = [[self window] representedFilename];
-    const char *kmlPathStr = [[kml kmlPath] UTF8String];
+    NSString *kmlPath = [kml kmlPath];
+    NSString *appPath = [[NSBundle mainBundle] bundlePath];
+    // If kml is inside app bundle, save path relative to app
+    // This way app location changes are handled robustly
+    if ([kmlPath hasPrefix: appPath])
+        kmlPath = [kmlPath substringFromIndex: ([appPath length]+1)];
+    const char *kmlPathStr = [kmlPath UTF8String];
 	nLength = strlen(kmlPathStr);
     write(hFile, &nLength, sizeof(nLength));
     write(hFile, kmlPathStr, nLength);

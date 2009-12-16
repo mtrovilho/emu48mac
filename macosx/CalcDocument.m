@@ -102,6 +102,7 @@
     BOOL result = NO;
     if ([aType isEqualToString: @"Emu48 State"])
     {
+        [[NSFileManager defaultManager] changeCurrentDirectoryPath: [[NSBundle mainBundle] bundlePath]];
         result = [[CalcBackend sharedBackend] readFromState:[absoluteURL path] error:outError];
         if (result)
         {
@@ -138,6 +139,7 @@
     BOOL result = NO;
     if ([aType isEqualToString: @"Emu48 State"])
     {
+        [[NSFileManager defaultManager] changeCurrentDirectoryPath: [[NSBundle mainBundle] bundlePath]];
         result = [[CalcBackend sharedBackend] saveStateAs:[absoluteURL path] error:outError];
         return result;
     }

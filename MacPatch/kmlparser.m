@@ -367,7 +367,7 @@ NSString *GetStringParam(KmlBlock* pBlock, TokenId eBlock, TokenId eCommand, UIN
 	[self KillKML];
 
 	nBlocksIncludeLevel = 0;
-	if((lpBuf = MapKMLFile(filename)) == nil)
+	if((lpBuf = MapKMLFile([filename lastPathComponent])) == nil) // already in kml folder so strip path to file
     {
         errReason = NSLocalizedString(@"The KML Script was either moved, has bad permissions, or is in an unrecognized encoding.",@"");
 		goto quit;
