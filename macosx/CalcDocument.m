@@ -115,7 +115,9 @@
         }
         return result;
     }
-    else if ([aType isEqualToString: @"KML File"])
+  // TODO: check here
+#warning TODO
+    else if ([aType isEqualToString: @"KML File"] || [aType isEqualToString: @"com.dw.emu48-kml"])
     {
         result = [[CalcBackend sharedBackend] makeUntitledCalcWithKml: [absoluteURL path] error:outError];
         if (result)
