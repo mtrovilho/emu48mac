@@ -37,7 +37,7 @@
     
     if (result == NSOKButton)
     {
-        NSArray *filesToOpen = [oPanel filenames];
+        NSArray *filesToOpen = [oPanel URLs];
         NSString *aFile = [filesToOpen objectAtIndex:0];
         [[NSUserDefaults standardUserDefaults] setObject:aFile forKey:@"Port2Filename"];
     }
