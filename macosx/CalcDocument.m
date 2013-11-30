@@ -31,7 +31,7 @@
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setResolvesAliases: YES];
     [panel setAllowsMultipleSelection: NO];
-    result = [panel runModalForTypes: nil];
+    result = [panel runModal];
     if (result == NSOKButton)
     {
         NSError *err = nil;

@@ -32,7 +32,8 @@
     
     [oPanel setResolvesAliases: YES];
     [oPanel setAllowsMultipleSelection: NO];
-    result = [oPanel runModalForTypes: fileTypes];
+    [oPanel setAllowedFileTypes: fileTypes];
+    result = [oPanel runModal];
     
     if (result == NSOKButton)
     {
