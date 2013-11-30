@@ -35,7 +35,7 @@
     if (result == NSOKButton)
     {
         NSError *err = nil;
-        if (![[CalcBackend sharedBackend] readFromObject:[panel filename] error:&err] && err)
+        if (![[CalcBackend sharedBackend] readFromObjectURL:[panel URL] error:&err] && err)
             [self presentError: err];
     }
 }
@@ -57,7 +57,7 @@
     if (result == NSOKButton)
     {
         NSError *err = nil;
-        if (![[CalcBackend sharedBackend] saveObjectAs:[panel filename] error:&err] && err)
+        if (![[CalcBackend sharedBackend] saveObjectAsURL:[panel URL] error:&err] && err)
             [self presentError: err];
     }
 }
