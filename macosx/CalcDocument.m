@@ -175,7 +175,12 @@
             {
                 parentPath = [parentPath stringByAppendingPathComponent: pathComp];
                 if (![fm fileExistsAtPath:parentPath isDirectory:&isFolder])
-                    [fm createDirectoryAtPath:parentPath attributes:nil];
+                {
+                    NSError *error = nil;
+                    [fm createDirectoryAtPath:parentPath withIntermediateDirectories:YES attributes:nil error:&error];
+                    if (error)
+                        NSLog(@"%@", [error localizedDescription]);
+                }
             }
         }
         else if (!isFolder)
