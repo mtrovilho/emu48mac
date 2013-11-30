@@ -65,9 +65,9 @@
         if (blockIndex < 0 || blockIndex >= sizeof(BLOCK_SIZES))
             blockIndex = 0;
         int numBlocks = BLOCK_SIZES[blockIndex];
-        if (NewPort2([panel filename], numBlocks))
+        if (NewPort2([[panel URL] absoluteString], numBlocks))
         {
-            [[NSUserDefaults standardUserDefaults] setObject:[panel filename] forKey:@"Port2Filename"];
+            [[NSUserDefaults standardUserDefaults] setObject:[[panel URL] absoluteString] forKey:@"Port2Filename"];
         }
     }
 }
